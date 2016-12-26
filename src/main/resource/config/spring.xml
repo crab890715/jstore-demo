@@ -11,48 +11,74 @@
 	default-lazy-init="true">
 
 	<context:component-scan base-package="com.demo.*"></context:component-scan>
+	<bean id="configProperties"
+		class="org.springframework.beans.factory.config.PropertiesFactoryBean">
+		<property name="ignoreResourceNotFound" value="true" />
+		<property name="locations">
+			<list>
+				<value>classpath:/config/*.properties</value>
+			</list>
+		</property>
+	</bean>
+	<context:property-placeholder
+		properties-ref="configProperties" ignore-resource-not-found="true"
+		order="-2147483648" ignore-unresolvable="true"></context:property-placeholder>
 	<mongo:mongo id="mongo">
-		<mongo:options 
-		connections-per-host="${mongo.connectionsPerHost}"
-		threads-allowed-to-block-for-connection-multiplier="${mongo.threadsAllowedToBlockForConnectionMultiplier}"
-		connect-timeout="${mongo.connectTimeout}" 
-		max-wait-time="${mongo.maxWaitTime}"
-		auto-connect-retry="${mongo.autoConnectRetry}" 
-		socket-timeout="${mongo.socketTimeout}" />
+		<mongo:options connections-per-host="${mongo.connectionsPerHost}"
+			threads-allowed-to-block-for-connection-multiplier="${mongo.threadsAllowedToBlockForConnectionMultiplier}"
+			connect-timeout="${mongo.connectTimeout}" max-wait-time="${mongo.maxWaitTime}"
+			auto-connect-retry="${mongo.autoConnectRetry}" socket-timeout="${mongo.socketTimeout}" />
 	</mongo:mongo>
 	<mongo:db-factory id="mongoDbFactory1" dbname="${mongo.logstat.dbname}"
 		mongo-ref="mongo" />
 	<bean id="mongoTemplate1" class="org.springframework.data.mongodb.core.MongoTemplate">
-        <constructor-arg ref="mongoDbFactory1"/>
-    </bean>
-    <mongo:db-factory id="mongoDbFactory2" dbname="${mongo.oss.dbname}"
+		<constructor-arg ref="mongoDbFactory1" />
+	</bean>
+	<mongo:db-factory id="mongoDbFactory2" dbname="${mongo.oss.dbname}"
 		mongo-ref="mongo" />
 	<bean id="mongoTemplate2" class="org.springframework.data.mongodb.core.MongoTemplate">
-        <constructor-arg ref="mongoDbFactory2"/>
-    </bean>
-    <!-- spring data , redis template -->
-    <bean id="jedisPoolConfig" class="redis.clients.jedis.JedisPoolConfig">
-        <property name="maxTotal"><value>${redis.pool.maxTotal}</value></property>
-        <property name="maxIdle"><value>${redis.pool.maxIdle}</value></property>
-         <property name="minIdle"><value>${redis.pool.minIdle}</value></property>
-        <property name="timeBetweenEvictionRunsMillis"><value>${redis.pool.timeBetweenEvictionRunsMillis}</value></property>
-        <property name="minEvictableIdleTimeMillis"><value>${redis.pool.minEvictableIdleTimeMillis}</value></property>
-        <property name="testOnBorrow" ><value>${redis.pool.testOnBorrow}</value></property>
+		<constructor-arg ref="mongoDbFactory2" />
 	</bean>
-	
-	<bean id="sentinelConfiguration"  
-        class="org.springframework.data.redis.connection.RedisSentinelConfiguration">  
-		<constructor-arg name="master" type="java.lang.String" value="${server.redis.sentinel.masterName}"/>
-   		<constructor-arg name="sentinelHostAndPorts" type="java.util.Set" value="#{'${redis.sentinels.nodes}'.split(',')}"/>
-    </bean>  
-	 <bean id="jedisConnFactory"
-        class="org.springframework.data.redis.connection.jedis.JedisConnectionFactory">
-        <constructor-arg name="sentinelConfig" ref="sentinelConfiguration" />
-        <constructor-arg name="poolConfig" ref="jedisPoolConfig" />
-        <property name="timeout"><value>${redis.connection.factory.timeout}</value></property>
-        <property name="password"><value>${redis.password}</value> </property>
-    </bean>
-	<bean id="redisTemplate"
-   		 class="org.springframework.data.redis.core.RedisTemplate" 
-    		p:connection-factory-ref="jedisConnFactory"/>
+	<!-- spring data , redis template -->
+	<bean id="jedisPoolConfig" class="redis.clients.jedis.JedisPoolConfig">
+		<property name="maxTotal">
+			<value>${redis.pool.maxTotal}</value>
+		</property>
+		<property name="maxIdle">
+			<value>${redis.pool.maxIdle}</value>
+		</property>
+		<property name="minIdle">
+			<value>${redis.pool.minIdle}</value>
+		</property>
+		<property name="timeBetweenEvictionRunsMillis">
+			<value>${redis.pool.timeBetweenEvictionRunsMillis}</value>
+		</property>
+		<property name="minEvictableIdleTimeMillis">
+			<value>${redis.pool.minEvictableIdleTimeMillis}</value>
+		</property>
+		<property name="testOnBorrow">
+			<value>${redis.pool.testOnBorrow}</value>
+		</property>
+	</bean>
+
+	<bean id="sentinelConfiguration"
+		class="org.springframework.data.redis.connection.RedisSentinelConfiguration">
+		<constructor-arg name="master" type="java.lang.String"
+			value="${server.redis.sentinel.masterName}" />
+		<constructor-arg name="sentinelHostAndPorts" type="java.util.Set"
+			value="#{'${redis.sentinels.nodes}'.split(',')}" />
+	</bean>
+	<bean id="jedisConnFactory"
+		class="org.springframework.data.redis.connection.jedis.JedisConnectionFactory">
+		<constructor-arg name="sentinelConfig" ref="sentinelConfiguration" />
+		<constructor-arg name="poolConfig" ref="jedisPoolConfig" />
+		<property name="timeout">
+			<value>${redis.connection.factory.timeout}</value>
+		</property>
+		<property name="password">
+			<value>${redis.password}</value>
+		</property>
+	</bean>
+	<bean id="redisTemplate" class="org.springframework.data.redis.core.RedisTemplate"
+		p:connection-factory-ref="jedisConnFactory" />
 </beans:beans>
