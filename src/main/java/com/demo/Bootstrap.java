@@ -15,6 +15,7 @@ public class Bootstrap implements Serializable{
 	private static final long serialVersionUID = -813109633056593133L;
 
 	public static void main(String[] args) throws Exception {
+		SpringContext.load("/config/spring.xml");
 		TopologyBuilder builder = new TopologyBuilder();
 		builder.setSpout("spout", new DemoSpout(), 5);
 		builder.setBolt("split", new DemoBolt(), 8).shuffleGrouping("spout");
