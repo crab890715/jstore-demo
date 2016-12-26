@@ -23,8 +23,9 @@ public class DemoSpout extends BaseRichSpout {
 	public void nextTuple() {
 		String[] sentences = new String[] { "the cow jumped over the moon", "an apple a day keeps the doctor away",
 				"four score and seven years ago", "snow white and the seven dwarfs", "i am at two with nature" };
-		String sentence = sentences[_rand.nextInt(sentences.length)];
-		_collector.emit(new Values(sentence));
+		int r = _rand.nextInt(sentences.length);
+		String sentence = sentences[r];
+		_collector.emit(new Values(sentence,r));
 
 	}
 
@@ -35,7 +36,7 @@ public class DemoSpout extends BaseRichSpout {
 
 	@Override
 	public void declareOutputFields(OutputFieldsDeclarer arg0) {
-		arg0.declare(new Fields("word"));
+		arg0.declare(new Fields("word","rand"));
 	}
 
 }

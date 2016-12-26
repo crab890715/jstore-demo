@@ -1,8 +1,5 @@
 package com.demo;
 
-import java.util.Map;
-
-import backtype.storm.task.TopologyContext;
 import backtype.storm.topology.BasicOutputCollector;
 import backtype.storm.topology.OutputFieldsDeclarer;
 import backtype.storm.topology.base.BaseBasicBolt;
@@ -20,7 +17,8 @@ public class DemoBolt extends BaseBasicBolt{
 	@Override
 	public void execute(Tuple arg0, BasicOutputCollector arg1) {
 		String msg = arg0.getString(0);
-		System.err.println(msg);
+		int value = arg0.getIntegerByField("rand");
+		System.err.println(String.format("%s******** rand:%s", msg,value));
 	}
 
 	@Override
